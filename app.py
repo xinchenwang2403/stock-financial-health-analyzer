@@ -75,30 +75,17 @@ company_data = {
 # -----------------------------
 st.sidebar.header("Input Settings")
 
-input_mode = st.sidebar.radio(
-    "Choose input method:",
-    ["Select from company list", "Enter ticker manually"]
+selected_sector = st.sidebar.selectbox(
+    "Select sector:",
+    options=list(company_data.keys())
 )
 
-if input_mode == "Select from company list":
-    selected_sector = st.sidebar.selectbox(
-        "Select sector:",
-        options=list(company_data.keys())
-    )
+selected_company = st.sidebar.selectbox(
+    "Select a company:",
+    options=list(company_data[selected_sector].keys())
+)
 
-    selected_company = st.sidebar.selectbox(
-        "Select a company:",
-        options=list(company_data[selected_sector].keys())
-    )
-
-    ticker = company_data[selected_sector][selected_company]
-else:
-    ticker = st.sidebar.text_input(
-        "Enter a stock ticker symbol:",
-        value="AAPL"
-    ).strip().upper()
-    selected_sector = "Custom Input"
-    selected_company = ticker
+ticker = company_data[selected_sector][selected_company]
 
 period = st.sidebar.selectbox(
     "Select analysis period:",
@@ -159,7 +146,7 @@ def evaluate_solvency(debt_to_equity):
     if debt_to_equity < 50:
         return "Low leverage and strong solvency."
     elif debt_to_equity < 100:
-        return "Moderate leverage and acceptable solvency."
+        return "Moderate leverage and manageable solvency risk."
     else:
         return "High leverage may indicate solvency risk."
 
@@ -410,7 +397,7 @@ def load_local_financial_info(ticker):
 # -----------------------------
 if analyze_button:
     if not ticker:
-        st.warning("Please select or enter a valid stock ticker symbol.")
+        st.warning("Please select a valid stock ticker symbol.")
     else:
         hist = None
         info = {}
@@ -510,7 +497,7 @@ if analyze_button:
         sector = info.get("sector", "N/A")
         industry = info.get("industry", "N/A")
 
-        if sector == "N/A" and input_mode == "Select from company list":
+        if sector == "N/A":
             sector = selected_sector
 
         st.subheader(f"{company_name} ({ticker})")
@@ -770,4 +757,4 @@ if analyze_button:
         )
 
 else:
-    st.info("Please choose a company or enter a ticker in the sidebar, then click **Run Analysis**.")
+    st.info("Please choose a company from the sidebar, then click **Run Analysis**.")
