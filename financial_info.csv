@@ -1,40 +1,31 @@
 ticker,longName,sector,industry,marketCap,trailingPE,revenueGrowth,profitMargins,currentRatio,debtToEquity
-AAPL,Apple Inc.,Technology,Consumer Electronics,3500000000000,34.5,0.08,0.26,1.07,145.0
-MSFT,Microsoft Corporation,Technology,Software - Infrastructure,3200000000000,36.2,0.12,0.35,1.77,47.0
-TSLA,Tesla Inc.,Consumer Cyclical,Auto Manufacturers,850000000000,62.8,0.15,0.10,1.84,18.0
-NVDA,NVIDIA Corporation,Technology,Semiconductors,2900000000000,65.4,0.35,0.49,3.52,28.0
-AMZN,Amazon.com Inc.,Consumer Cyclical,Internet Retail,1900000000000,52.1,0.11,0.09,1.05,78.0
-META,Meta Platforms Inc.,Communication Services,Internet Content & Information,1300000000000,29.8,0.22,0.29,2.67,32.0
-GOOGL,Alphabet Inc.,Communication Services,Internet Content & Information,2100000000000,27.6,0.14,0.24,2.10,10.0
-
-ticker,longName,sector,industry,marketCap,trailingPE,revenueGrowth,profitMargins,currentRatio,debtToEquity
-AAPL,Apple Inc.,Technology,Consumer Electronics,3000000000000,28.5,0.05,0.25,1.10,145
-MSFT,Microsoft Corporation,Technology,Software - Infrastructure,3100000000000,35.2,0.12,0.36,1.70,40
-NVDA,NVIDIA Corporation,Technology,Semiconductors,2200000000000,60.0,0.40,0.48,3.50,30
-GOOGL,Alphabet Inc.,Communication Services,Internet Content & Information,1900000000000,27.8,0.11,0.24,2.10,12
-META,Meta Platforms Inc.,Communication Services,Internet Content & Information,1200000000000,26.5,0.16,0.29,2.60,18
-AMZN,Amazon.com Inc.,Consumer Cyclical,Internet Retail,1800000000000,55.0,0.10,0.08,1.05,80
-TSLA,Tesla Inc.,Consumer Cyclical,Auto Manufacturers,800000000000,70.0,0.12,0.10,1.80,20
-MCD,McDonald's Corporation,Consumer Cyclical,Restaurants,210000000000,24.0,0.09,0.33,1.20,95
-KO,Coca-Cola Company,Consumer Defensive,Beverages - Non-Alcoholic,270000000000,23.5,0.06,0.23,1.10,160
-PEP,PepsiCo Inc.,Consumer Defensive,Beverages - Non-Alcoholic,240000000000,25.1,0.05,0.11,0.90,210
-JPM,JPMorgan Chase & Co.,Financial Services,Banks - Diversified,550000000000,13.2,0.08,0.29,1.00,135
-BAC,Bank of America Corporation,Financial Services,Banks - Diversified,310000000000,12.5,0.07,0.25,0.98,125
-GS,Goldman Sachs Group Inc.,Financial Services,Capital Markets,140000000000,14.2,0.06,0.22,0.95,290
-C,Citigroup Inc.,Financial Services,Banks - Diversified,120000000000,11.0,0.05,0.18,0.97,180
-WFC,Wells Fargo & Company,Financial Services,Banks - Diversified,220000000000,12.0,0.06,0.21,0.96,140
-JNJ,Johnson & Johnson,Healthcare,Drug Manufacturers - General,390000000000,16.8,0.04,0.22,1.25,45
-PFE,Pfizer Inc.,Healthcare,Drug Manufacturers - General,160000000000,15.0,0.02,0.18,1.30,60
-MRK,Merck & Co. Inc.,Healthcare,Drug Manufacturers - General,320000000000,18.4,0.07,0.26,1.40,70
-ABBV,AbbVie Inc.,Healthcare,Drug Manufacturers - General,310000000000,17.6,0.09,0.23,0.95,420
-UNH,UnitedHealth Group Incorporated,Healthcare,Healthcare Plans,470000000000,22.0,0.13,0.06,0.85,75
-XOM,Exxon Mobil Corporation,Energy,Oil & Gas Integrated,470000000000,13.8,0.03,0.10,1.35,20
-CVX,Chevron Corporation,Energy,Oil & Gas Integrated,290000000000,14.6,0.04,0.11,1.20,18
-COP,ConocoPhillips,Energy,Oil & Gas E&P,140000000000,12.9,0.05,0.17,1.40,35
-CAT,Caterpillar Inc.,Industrials,Farm & Heavy Construction Machinery,170000000000,16.5,0.08,0.16,1.35,210
-BA,Boeing Company,Industrials,Aerospace & Defense,120000000000,N/A,0.10,-0.03,1.10,N/A
-GE,GE Aerospace,Industrials,Aerospace & Defense,180000000000,32.0,0.14,0.13,1.05,95
-HON,Honeywell International Inc.,Industrials,Conglomerates,140000000000,24.5,0.06,0.15,1.25,110
-DIS,Walt Disney Company,Communication Services,Entertainment,200000000000,22.5,0.07,0.08,1.00,50
-NFLX,Netflix Inc.,Communication Services,Entertainment,260000000000,38.0,0.11,0.15,1.20,75
-VZ,Verizon Communications Inc.,Communication Services,Telecom Services,170000000000,9.5,0.02,0.14,0.70,170
+AAPL,Apple Inc.,Technology,Consumer Electronics,3000000000000,30.5,0.08,0.25,1.07,195.0
+MSFT,Microsoft Corporation,Technology,Software Infrastructure,3200000000000,35.2,0.12,0.36,1.80,47.0
+NVDA,NVIDIA Corporation,Technology,Semiconductors,2200000000000,65.4,0.35,0.48,3.50,32.0
+GOOGL,Alphabet Inc.,Communication Services,Internet Content and Information,1900000000000,27.1,0.11,0.22,2.10,10.0
+META,Meta Platforms Inc.,Communication Services,Internet Content and Information,1200000000000,29.8,0.15,0.29,2.60,18.0
+DIS,Walt Disney Company,Communication Services,Entertainment,180000000000,22.5,0.06,0.08,1.05,55.0
+NFLX,Netflix Inc.,Communication Services,Entertainment,260000000000,41.2,0.13,0.18,1.20,75.0
+VZ,Verizon Communications Inc.,Communication Services,Telecom Services,170000000000,8.9,0.02,0.14,0.67,155.0
+AMZN,Amazon.com Inc.,Consumer,Internet Retail,1800000000000,58.4,0.10,0.08,1.05,80.0
+TSLA,Tesla Inc.,Consumer,Auto Manufacturers,700000000000,70.2,0.12,0.11,1.70,15.0
+MCD,McDonald's Corporation,Consumer,Restaurants,210000000000,24.7,0.09,0.34,1.10,210.0
+KO,Coca-Cola Company,Consumer,Beverages Non-Alcoholic,270000000000,25.1,0.05,0.23,1.14,165.0
+PEP,PepsiCo Inc.,Consumer,Beverages Non-Alcoholic,240000000000,23.4,0.04,0.10,0.89,220.0
+JPM,JPMorgan Chase and Co.,Financial Services,Banks Diversified,550000000000,13.2,0.07,0.28,0.90,140.0
+BAC,Bank of America Corporation,Financial Services,Banks Diversified,310000000000,12.4,0.05,0.24,0.88,135.0
+GS,Goldman Sachs Group Inc.,Financial Services,Capital Markets,140000000000,14.1,0.06,0.21,0.95,185.0
+C,Citigroup Inc.,Financial Services,Banks Diversified,120000000000,10.8,0.03,0.18,0.92,170.0
+WFC,Wells Fargo and Company,Financial Services,Banks Diversified,210000000000,11.7,0.04,0.20,0.91,145.0
+JNJ,Johnson and Johnson,Healthcare,Drug Manufacturers General,380000000000,16.4,0.05,0.21,1.25,45.0
+PFE,Pfizer Inc.,Healthcare,Drug Manufacturers General,160000000000,13.6,-0.02,0.12,1.30,62.0
+MRK,Merck and Co. Inc.,Healthcare,Drug Manufacturers General,330000000000,18.8,0.07,0.27,1.45,70.0
+ABBV,AbbVie Inc.,Healthcare,Drug Manufacturers General,310000000000,17.9,0.04,0.22,0.93,410.0
+UNH,UnitedHealth Group Incorporated,Healthcare,Healthcare Plans,460000000000,21.3,0.09,0.06,0.82,78.0
+XOM,Exxon Mobil Corporation,Energy,Oil and Gas Integrated,480000000000,14.8,0.06,0.09,1.35,20.0
+CVX,Chevron Corporation,Energy,Oil and Gas Integrated,290000000000,13.9,0.05,0.10,1.28,18.0
+COP,ConocoPhillips,Energy,Oil and Gas Exploration and Production,140000000000,12.7,0.04,0.17,1.40,35.0
+CAT,Caterpillar Inc.,Industrials,Farm and Heavy Construction Machinery,170000000000,15.1,0.08,0.16,1.40,210.0
+BA,Boeing Company,Industrials,Aerospace and Defense,120000000000,-15.0,0.07,-0.03,1.10,-350.0
+GE,GE Aerospace,Industrials,Aerospace and Defense,180000000000,32.0,0.11,0.14,1.25,95.0
+HON,Honeywell International Inc.,Industrials,Specialty Industrial Machinery,135000000000,24.3,0.06,0.15,1.30,85.0
