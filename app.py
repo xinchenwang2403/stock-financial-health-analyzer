@@ -4,6 +4,8 @@ import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # -----------------------------
 # Page configuration
 # -----------------------------
@@ -169,11 +171,11 @@ def evaluate_solvency(debt_to_equity):
     if debt_to_equity is None:
         return "Solvency could not be assessed because debt-to-equity data is not available."
     if debt_to_equity < 50:
-        return "The company appears financially conservative with strong solvency."
+        return "The company has a relatively strong solvency position."
     elif debt_to_equity < 100:
-        return "The company shows a moderate solvency position."
+        return "The company has a moderate solvency position."
     else:
-        return "The company may face higher solvency risk due to elevated leverage."
+        return "The company may have a relatively weak solvency position due to high leverage."
 
 def evaluate_profitability(profit_margins):
     profit_margins = clean_numeric(profit_margins)
@@ -334,6 +336,18 @@ def build_export_dataframe(
     }
     return pd.DataFrame(data)
 
+def find_file(filename):
+    candidate_paths = [
+        os.path.join(BASE_DIR, "data", filename),
+        os.path.join(BASE_DIR, filename)
+    ]
+    for path in candidate_paths:
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(
+        f"File not found in either location: {candidate_paths[0]} or {candidate_paths[1]}"
+    )
+
 # -----------------------------
 # Data loading functions
 # -----------------------------
@@ -350,11 +364,7 @@ def load_stock_info_online(ticker):
 
 @st.cache_data(ttl=1800)
 def load_local_csv_data(ticker, period):
-    file_path = os.path.join("data", f"{ticker}.csv")
-
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Local CSV file not found: {file_path}")
-
+    file_path = find_file(f"{ticker}.csv")
     df = pd.read_csv(file_path)
 
     if "Date" not in df.columns:
@@ -372,15 +382,14 @@ def load_local_csv_data(ticker, period):
     cutoff_date = latest_date - pd.Timedelta(days=days)
     filtered_df = df[df.index >= cutoff_date]
 
+    if filtered_df.empty:
+        raise ValueError(f"No local stock data available for ticker {ticker} within period {period}.")
+
     return filtered_df
 
 @st.cache_data(ttl=1800)
 def load_local_financial_info(ticker):
-    file_path = os.path.join("data", "financial_info.csv")
-
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Local financial info file not found: {file_path}")
-
+    file_path = find_file("financial_info.csv")
     df = pd.read_csv(file_path)
 
     if "ticker" not in df.columns:
