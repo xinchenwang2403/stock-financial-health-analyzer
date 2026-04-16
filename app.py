@@ -106,65 +106,90 @@ st.sidebar.write(f"**Sector Group:** {selected_sector}")
 # -----------------------------
 # Helper functions
 # -----------------------------
-def format_value(value, percentage=False):
-    if value is None or value == "N/A":
-        return "N/A"
-    try:
-        if isinstance(value, str):
-            if value.strip().upper() == "N/A":
-                return "N/A"
-            value = float(value)
+def is_valid_number(value):
+    return isinstance(value, (int, float)) and pd.notna(value)
 
+def clean_numeric(value):
+    if value is None:
+        return None
+    if isinstance(value, str):
+        if value.strip().upper() in ["N/A", "NONE", "", "NAN"]:
+            return None
+        try:
+            return float(value)
+        except Exception:
+            return None
+    if pd.isna(value):
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    return None
+
+def display_text(value, fallback="Data not available"):
+    if value is None:
+        return fallback
+    if isinstance(value, str) and value.strip().upper() == "N/A":
+        return fallback
+    if isinstance(value, str) and value.strip() == "":
+        return fallback
+    return value
+
+def format_value(value, percentage=False):
+    value = clean_numeric(value)
+    if value is None:
+        return "Data not available"
+
+    try:
         if percentage:
             return f"{value * 100:.2f}%"
 
-        if value >= 1e12:
+        if abs(value) >= 1e12:
             return f"{value / 1e12:.2f}T"
-        elif value >= 1e9:
+        elif abs(value) >= 1e9:
             return f"{value / 1e9:.2f}B"
-        elif value >= 1e6:
+        elif abs(value) >= 1e6:
             return f"{value / 1e6:.2f}M"
         return f"{value:,.2f}"
     except Exception:
-        return str(value)
-
+        return "Data not available"
 
 def evaluate_liquidity(current_ratio):
-    if not isinstance(current_ratio, (int, float)):
-        return "Liquidity data is unavailable."
+    current_ratio = clean_numeric(current_ratio)
+    if current_ratio is None:
+        return "Liquidity could not be assessed because the current ratio is not available."
     if current_ratio >= 1.5:
-        return "Good liquidity position."
+        return "The company shows a good liquidity position."
     elif current_ratio >= 1.0:
-        return "Acceptable liquidity position."
+        return "The company has an acceptable liquidity position."
     else:
-        return "Weak liquidity position."
-
+        return "The company may have a relatively weak liquidity position."
 
 def evaluate_solvency(debt_to_equity):
-    if not isinstance(debt_to_equity, (int, float)):
-        return "Solvency data is unavailable."
+    debt_to_equity = clean_numeric(debt_to_equity)
+    if debt_to_equity is None:
+        return "Solvency could not be assessed because debt-to-equity data is not available."
     if debt_to_equity < 50:
-        return "Low leverage and strong solvency."
+        return "The company appears financially conservative with strong solvency."
     elif debt_to_equity < 100:
-        return "Moderate leverage and manageable solvency risk."
+        return "The company shows a moderate solvency position."
     else:
-        return "High leverage may indicate solvency risk."
-
+        return "The company may face higher solvency risk due to elevated leverage."
 
 def evaluate_profitability(profit_margins):
-    if not isinstance(profit_margins, (int, float)):
-        return "Profitability data is unavailable."
+    profit_margins = clean_numeric(profit_margins)
+    if profit_margins is None:
+        return "Profitability could not be assessed because profit margin data is not available."
     if profit_margins > 0.20:
-        return "Company shows strong profitability."
+        return "The company shows strong profitability."
     elif profit_margins > 0.10:
-        return "Company shows decent profitability."
+        return "The company shows decent profitability."
     else:
-        return "Profitability may be weak."
-
+        return "The company’s profitability appears relatively weak."
 
 def evaluate_growth(revenue_growth):
-    if not isinstance(revenue_growth, (int, float)):
-        return "Growth data is unavailable."
+    revenue_growth = clean_numeric(revenue_growth)
+    if revenue_growth is None:
+        return "Growth could not be assessed because revenue growth data is not available."
     if revenue_growth > 0.10:
         return "Revenue is growing strongly."
     elif revenue_growth > 0:
@@ -172,9 +197,9 @@ def evaluate_growth(revenue_growth):
     else:
         return "Revenue growth is weak or negative."
 
-
 def score_liquidity(current_ratio):
-    if not isinstance(current_ratio, (int, float)):
+    current_ratio = clean_numeric(current_ratio)
+    if current_ratio is None:
         return None
     if current_ratio >= 1.5:
         return 25
@@ -183,9 +208,9 @@ def score_liquidity(current_ratio):
     else:
         return 10
 
-
 def score_solvency(debt_to_equity):
-    if not isinstance(debt_to_equity, (int, float)):
+    debt_to_equity = clean_numeric(debt_to_equity)
+    if debt_to_equity is None:
         return None
     if debt_to_equity < 50:
         return 25
@@ -194,9 +219,9 @@ def score_solvency(debt_to_equity):
     else:
         return 10
 
-
 def score_profitability(profit_margins):
-    if not isinstance(profit_margins, (int, float)):
+    profit_margins = clean_numeric(profit_margins)
+    if profit_margins is None:
         return None
     if profit_margins > 0.20:
         return 25
@@ -205,9 +230,9 @@ def score_profitability(profit_margins):
     else:
         return 10
 
-
 def score_growth(revenue_growth):
-    if not isinstance(revenue_growth, (int, float)):
+    revenue_growth = clean_numeric(revenue_growth)
+    if revenue_growth is None:
         return None
     if revenue_growth > 0.15:
         return 25
@@ -215,7 +240,6 @@ def score_growth(revenue_growth):
         return 18
     else:
         return 10
-
 
 def calculate_overall_score(current_ratio, debt_to_equity, profit_margins, revenue_growth):
     scores = {
@@ -230,9 +254,12 @@ def calculate_overall_score(current_ratio, debt_to_equity, profit_margins, reven
     if not available_scores:
         return None, scores
 
-    overall_score = sum(available_scores)
-    return overall_score, scores
+    if len(available_scores) == 4:
+        overall_score = sum(available_scores)
+    else:
+        overall_score = round(sum(available_scores) / len(available_scores) * 4)
 
+    return overall_score, scores
 
 def score_label(score):
     if score is None:
@@ -246,7 +273,6 @@ def score_label(score):
     else:
         return "Weak"
 
-
 def build_overall_summary(liquidity_msg, solvency_msg, profitability_msg, growth_msg, score):
     summary_parts = []
 
@@ -256,15 +282,17 @@ def build_overall_summary(liquidity_msg, solvency_msg, profitability_msg, growth
             f"which is classified as {score_label(score).lower()}."
         )
 
+    useful_messages = []
     for msg in [liquidity_msg, solvency_msg, profitability_msg, growth_msg]:
-        if "unavailable" not in msg.lower():
-            summary_parts.append(msg)
+        if msg and "could not be assessed" not in msg.lower():
+            useful_messages.append(msg)
+
+    summary_parts.extend(useful_messages)
 
     if not summary_parts:
         return "Overall summary: insufficient financial data is available to generate a meaningful assessment."
 
     return "Overall summary: " + " ".join(summary_parts)
-
 
 def period_to_days(period):
     mapping = {
@@ -276,7 +304,6 @@ def period_to_days(period):
         "10y": 365 * 10
     }
     return mapping.get(period, 180)
-
 
 def build_export_dataframe(
     ticker, company_name, sector, industry,
@@ -307,7 +334,6 @@ def build_export_dataframe(
     }
     return pd.DataFrame(data)
 
-
 # -----------------------------
 # Data loading functions
 # -----------------------------
@@ -317,12 +343,10 @@ def load_stock_history_online(ticker, period):
     hist = stock.history(period=period)
     return hist
 
-
 @st.cache_data(ttl=1800)
 def load_stock_info_online(ticker):
     stock = yf.Ticker(ticker)
     return stock.info
-
 
 @st.cache_data(ttl=1800)
 def load_local_csv_data(ticker, period):
@@ -349,7 +373,6 @@ def load_local_csv_data(ticker, period):
     filtered_df = df[df.index >= cutoff_date]
 
     return filtered_df
-
 
 @st.cache_data(ttl=1800)
 def load_local_financial_info(ticker):
@@ -381,16 +404,9 @@ def load_local_financial_info(ticker):
 
     for field in numeric_fields:
         if field in record:
-            try:
-                if str(record[field]).strip().upper() == "N/A":
-                    record[field] = "N/A"
-                else:
-                    record[field] = float(record[field])
-            except Exception:
-                record[field] = "N/A"
+            record[field] = clean_numeric(record[field])
 
     return record
-
 
 # -----------------------------
 # Main analysis
@@ -457,14 +473,14 @@ if analyze_button:
                 local_info_error = str(e)
                 info = {
                     "longName": ticker,
-                    "sector": "N/A",
-                    "industry": "N/A",
-                    "marketCap": "N/A",
-                    "trailingPE": "N/A",
-                    "revenueGrowth": "N/A",
-                    "profitMargins": "N/A",
-                    "currentRatio": "N/A",
-                    "debtToEquity": "N/A",
+                    "sector": selected_sector,
+                    "industry": None,
+                    "marketCap": None,
+                    "trailingPE": None,
+                    "revenueGrowth": None,
+                    "profitMargins": None,
+                    "currentRatio": None,
+                    "debtToEquity": None,
                 }
                 info_source = "Unavailable"
 
@@ -481,7 +497,7 @@ if analyze_button:
             st.info("Live company financial indicators were unavailable, so the app used local financial_info.csv data.")
 
         if info_source == "Unavailable":
-            st.warning("Company financial indicators are unavailable from Yahoo Finance and local sources.")
+            st.warning("Company financial indicators are currently unavailable from both Yahoo Finance and local sources.")
 
         with st.expander("View data retrieval details"):
             if online_price_error:
@@ -493,12 +509,9 @@ if analyze_button:
             if local_info_error:
                 st.write(f"**Local financial info error:** {local_info_error}")
 
-        company_name = info.get("longName", ticker)
-        sector = info.get("sector", "N/A")
-        industry = info.get("industry", "N/A")
-
-        if sector == "N/A":
-            sector = selected_sector
+        company_name = display_text(info.get("longName", ticker), ticker)
+        sector = display_text(info.get("sector", selected_sector), selected_sector)
+        industry = display_text(info.get("industry", None), "Not provided")
 
         st.subheader(f"{company_name} ({ticker})")
         st.write(f"**Sector:** {sector} | **Industry:** {industry}")
@@ -627,12 +640,12 @@ if analyze_button:
         # -----------------------------
         st.header("2. Key Financial Indicators")
 
-        market_cap = info.get("marketCap", "N/A")
-        trailing_pe = info.get("trailingPE", "N/A")
-        revenue_growth = info.get("revenueGrowth", "N/A")
-        profit_margins = info.get("profitMargins", "N/A")
-        current_ratio = info.get("currentRatio", "N/A")
-        debt_to_equity = info.get("debtToEquity", "N/A")
+        market_cap = info.get("marketCap", None)
+        trailing_pe = info.get("trailingPE", None)
+        revenue_growth = info.get("revenueGrowth", None)
+        profit_margins = info.get("profitMargins", None)
+        current_ratio = info.get("currentRatio", None)
+        debt_to_equity = info.get("debtToEquity", None)
 
         col6, col7, col8 = st.columns(3)
         col6.metric("Market Cap", format_value(market_cap))
@@ -643,6 +656,18 @@ if analyze_button:
         col9.metric("Debt to Equity", format_value(debt_to_equity))
         col10.metric("Revenue Growth", format_value(revenue_growth, percentage=True))
         col11.metric("Profit Margins", format_value(profit_margins, percentage=True))
+
+        available_financial_items = sum([
+            clean_numeric(market_cap) is not None,
+            clean_numeric(trailing_pe) is not None,
+            clean_numeric(revenue_growth) is not None,
+            clean_numeric(profit_margins) is not None,
+            clean_numeric(current_ratio) is not None,
+            clean_numeric(debt_to_equity) is not None
+        ])
+
+        if available_financial_items <= 2:
+            st.info("Only limited financial indicator data is currently available for this company.")
 
         # -----------------------------
         # Financial Dimension Evaluation
@@ -685,7 +710,7 @@ if analyze_button:
         score_col1, score_col2 = st.columns(2)
         score_col1.metric(
             "Overall Score",
-            f"{overall_score}/100" if overall_score is not None else "N/A"
+            f"{overall_score}/100" if overall_score is not None else "Insufficient data"
         )
         score_col2.metric(
             "Rating",
@@ -693,10 +718,10 @@ if analyze_button:
         )
 
         st.subheader("Dimension Scores")
-        st.write(f"- Liquidity: {dimension_scores['Liquidity'] if dimension_scores['Liquidity'] is not None else 'N/A'} / 25")
-        st.write(f"- Solvency: {dimension_scores['Solvency'] if dimension_scores['Solvency'] is not None else 'N/A'} / 25")
-        st.write(f"- Profitability: {dimension_scores['Profitability'] if dimension_scores['Profitability'] is not None else 'N/A'} / 25")
-        st.write(f"- Growth: {dimension_scores['Growth'] if dimension_scores['Growth'] is not None else 'N/A'} / 25")
+        st.write(f"- Liquidity: {dimension_scores['Liquidity'] if dimension_scores['Liquidity'] is not None else 'Not available'} / 25")
+        st.write(f"- Solvency: {dimension_scores['Solvency'] if dimension_scores['Solvency'] is not None else 'Not available'} / 25")
+        st.write(f"- Profitability: {dimension_scores['Profitability'] if dimension_scores['Profitability'] is not None else 'Not available'} / 25")
+        st.write(f"- Growth: {dimension_scores['Growth'] if dimension_scores['Growth'] is not None else 'Not available'} / 25")
 
         # -----------------------------
         # Summary Insight
@@ -733,12 +758,12 @@ if analyze_button:
             price_change=price_change,
             price_change_pct=price_change_pct,
             avg_volume=avg_volume,
-            market_cap=market_cap,
-            trailing_pe=trailing_pe,
-            revenue_growth=revenue_growth,
-            profit_margins=profit_margins,
-            current_ratio=current_ratio,
-            debt_to_equity=debt_to_equity,
+            market_cap=market_cap if market_cap is not None else "N/A",
+            trailing_pe=trailing_pe if trailing_pe is not None else "N/A",
+            revenue_growth=revenue_growth if revenue_growth is not None else "N/A",
+            profit_margins=profit_margins if profit_margins is not None else "N/A",
+            current_ratio=current_ratio if current_ratio is not None else "N/A",
+            debt_to_equity=debt_to_equity if debt_to_equity is not None else "N/A",
             overall_score=overall_score,
             overall_rating=score_label(overall_score),
             price_source=price_source,
