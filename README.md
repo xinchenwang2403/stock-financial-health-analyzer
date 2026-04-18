@@ -233,7 +233,7 @@ company news
 market news
 Export the result as CSV if needed.
 
-##Key Insights & Results
+**Key Insights & Results**
 1. Stock price movements alone do not provide a full evaluation
 A company may show strong recent price performance, but this does not necessarily mean it has strong liquidity, profitability, or solvency. The dashboard highlights the importance of combining market data with financial indicators.
 
@@ -249,19 +249,19 @@ The inclusion of local CSV fallback demonstrates that data availability and reli
 5. Simplicity improves accessibility
 By presenting data with clear metrics, section headings, user controls, and plain-language interpretation, the dashboard makes financial analysis more accessible to non-expert users.
 
-##Links
+**Links**
 GitHub Repository: [replace with your GitHub repository link]
 Demo Video: [replace with your demo video link]
 Online Streamlit App (if available): [ Local URL: http://localhost:8502
   Network URL: http://192.168.10.3:8502]
 
-##Author Info
+**Author Info**
 Name: [Xinchen.Wang2403]
 Student ID: [2470712]
 Course Code: ACC102
 Track: [Track 4]
 
-##AI Disclosure
+**AI Disclosure**
 I used ChatGPT on [April/2026] to help with:
 
 improving the structure and wording of the README
@@ -270,6 +270,6 @@ improving the clarity of the analytical problem, user focus, and key insights
 supporting code explanation and documentation writing
 All final coding decisions, project design decisions, file organisation, testing, and final review were completed by me.
 
-##Notes 
+**NOTES:**
 
 This dashboard is intended for educational and exploratory purposes only. It provides a simple rule-based interpretation of selected financial indicators and public market information. It should not be treated as professional financial advice or investment advice.
