@@ -1,300 +1,275 @@
 # Stock Financial Health Analyzer
 
-## Introduction
+## Project Overview
+The **Stock Financial Health Analyzer** is an interactive Streamlit dashboard designed to help users evaluate a company’s stock performance, financial health, and latest investment-related news in one place. The tool combines market price trends, selected accounting and financial indicators, and daily news updates to support more informed exploratory analysis.
 
-The **Stock Financial Health Analyzer** is a Streamlit-based web application developed for financial data exploration and basic company health assessment. The system allows users to select companies from multiple sectors, review historical stock price trends, examine key financial indicators, and obtain a simplified rule-based evaluation of financial health.
-
-The application is designed to combine **market performance analysis** with **fundamental financial assessment** in an interactive dashboard. To improve reliability, the system first attempts to retrieve data from **Yahoo Finance** through the `yfinance` library and then automatically falls back to **local CSV files** if online data retrieval is unavailable or incomplete.
-
-This project is intended for **educational and analytical purposes**. It provides users with a convenient way to understand selected financial indicators and their relationship to a company’s overall financial condition.
+This product is designed for **students, beginner investors, and non-specialist users** who want an accessible way to understand both market behaviour and basic company fundamentals without using complex professional financial platforms.
 
 ---
 
-## Objectives
+## Analytical Problem
+Many users can observe stock price movements, but they often lack a simple way to connect those movements with core financial health indicators and current news context. Looking only at stock prices can be misleading, because a company’s market performance does not always reflect its liquidity, solvency, profitability, or growth position.
 
-The main objectives of this project are:
+This project addresses the following analytical problem:
 
-- to build an interactive stock analysis dashboard using Streamlit;
-- to visualize stock market trends for selected companies;
-- to present important financial indicators in a clear and structured format;
-- to provide a rule-based financial health evaluation framework;
-- to improve robustness by using local CSV fallback data when online retrieval fails;
-- to support export of analysis results for further review.
+> **How can users evaluate a company more effectively by combining stock price trends, selected financial indicators, and recent investment news in one dashboard?**
+
+This is relevant in a **financial and accounting context** because financial information becomes more useful when it is presented in a way that supports interpretation, comparison, and decision-making.
 
 ---
 
-## Key Features
+## Dataset Information
 
-The application provides the following features:
+### 1. Yahoo Finance Data
+**Source:** Yahoo Finance via the `yfinance` Python library  
+**Access date:** [replace with your actual access date, e.g. 18 April 2026]  
+**Type of data used:**
+- Historical stock price data
+- Company financial information
+- Company-related news
+- Market-wide news linked to major indices
 
-### 1. Company Selection by Sector
-Users can choose companies from several predefined sector categories, including:
+**Coverage:**
+- Stocks from multiple sectors, including:
+  - Technology
+  - Communication Services
+  - Consumer
+  - Financial Services
+  - Healthcare
+  - Energy
+  - Industrials
+- Historical price periods selectable by the user:
+  - 1 month
+  - 3 months
+  - 6 months
+  - 1 year
+  - 5 years
+  - 10 years
+- Financial indicators used:
+  - Market Capitalisation
+  - Trailing P/E
+  - Revenue Growth
+  - Profit Margins
+  - Current Ratio
+  - Debt to Equity
+- News coverage:
+  - Company-specific news for the selected stock
+  - Market-wide news from major indices such as S&P 500, Nasdaq, and Dow Jones
 
-- Technology
-- Communication Services
-- Consumer
-- Financial Services
-- Healthcare
-- Energy
-- Industrials
+**Why this dataset was chosen:**  
+Yahoo Finance is suitable for this project because it provides a practical and accessible source of public financial market data. It supports both stock-level and company-level analysis and enables the integration of price data, financial indicators, and current news into one product. This makes it well aligned with the analytical goal of combining numerical financial analysis with real-time market context.
 
-### 2. Historical Stock Price Analysis
-The dashboard supports different time periods for analysis:
+---
 
-- 1 month
-- 3 months
-- 6 months
-- 1 year
-- 5 years
-- 10 years
+### 2. Local CSV Fallback Data
+**Source:** Local CSV files prepared for the project  
+**Access date:** [replace with your actual preparation/use date]  
 
-For the selected company, the system displays:
+**Files used:**
+- Individual stock CSV files such as `AAPL.csv`, `MSFT.csv`, etc.
+- `financial_info.csv`
 
-- latest closing price
-- price change over the selected period
-- percentage price change
-- highest and lowest prices
-- average trading volume
+**Purpose:**  
+The local CSV files are used as a fallback when online retrieval from Yahoo Finance is unavailable. This improves the reliability and reproducibility of the dashboard during demonstration or assessment.
 
-### 3. Interactive Visualizations
-The application includes several visual components:
+**Why this dataset was chosen:**  
+A fallback dataset was included to make the application more stable and user-friendly. If live retrieval fails, the dashboard can still display stock price data and selected financial indicators from local files.
 
-- closing price trend chart
-- optional moving averages (20-day and 50-day)
-- optional candlestick chart
-- optional trading volume chart
-- recent stock data table
+---
 
-### 4. Financial Indicator Analysis
-The dashboard presents key financial metrics, including:
+## Python Workflow
 
-- Market Capitalization
-- Trailing Price-to-Earnings Ratio (P/E)
-- Revenue Growth
-- Profit Margins
-- Current Ratio
-- Debt-to-Equity Ratio
+The project follows a complete Python-based analytical workflow:
 
-### 5. Financial Health Evaluation
-The project evaluates financial condition across four dimensions:
+### 1. Data Retrieval
+- The app first retrieves **historical stock prices** using `yfinance`.
+- It then retrieves **company financial information** using `yfinance`.
+- It also retrieves:
+  - **company news** for the selected stock
+  - **market news** from major market indices
+- If online stock or financial data retrieval fails, the app uses **local CSV fallback files**.
 
+### 2. Data Cleaning
+The project includes functions to:
+- handle missing values
+- convert text-based numeric values into float format
+- standardise invalid entries such as `N/A`, blank strings, or null values
+- validate data before display and analysis
+
+### 3. Data Transformation
+The app transforms raw data into useful analytical outputs by:
+- filtering historical prices according to the selected time period
+- calculating price change and percentage change
+- calculating average trading volume
+- generating moving averages (20-day and 50-day)
+- formatting large values such as millions, billions, and trillions
+- parsing nested news data structures from Yahoo Finance into readable fields
+
+### 4. Financial Analysis
+The dashboard evaluates four financial dimensions:
 - **Liquidity**
 - **Solvency**
 - **Profitability**
 - **Growth**
 
-Each dimension is assessed using a simple rule-based approach, and the system generates an overall financial health score and rating.
+It then applies a simple rule-based scoring framework to generate:
+- dimension scores
+- an **overall financial health score**
+- a final rating such as:
+  - Excellent
+  - Good
+  - Moderate
+  - Weak
 
-### 6. Export Function
-Users can download the current analysis result as a CSV file for reporting or further analysis.
+### 5. Visualisation
+The dashboard uses interactive visualisation to improve interpretation:
+- line chart for closing price trend
+- optional moving average overlays
+- candlestick chart
+- trading volume bar chart
+- dashboard metrics for key stock and financial indicators
 
-### 7. Data Fallback Mechanism
-A key strength of this project is its fallback strategy:
-
-- online data is retrieved from Yahoo Finance when available;
-- if online retrieval fails, the application uses local CSV files;
-- this improves stability and reduces the impact of API errors or rate limiting.
-
----
-
-## System Design
-
-The system is organized around a single Streamlit application file, supported by local data files and optional helper scripts.
-
-### Main Workflow
-
-1. The user selects a sector and a company in the sidebar.
-2. The user chooses an analysis period and optional chart settings.
-3. After clicking **Run Analysis**, the application:
-   - loads stock price history,
-   - loads company financial information,
-   - displays market overview metrics,
-   - generates charts,
-   - evaluates financial dimensions,
-   - calculates an overall score,
-   - enables CSV export.
+### 6. Result Output
+The app outputs:
+- stock performance summary
+- financial indicator summary
+- overall financial health score
+- company news
+- market news
+- downloadable CSV export of key analysis results
 
 ---
 
-## Financial Evaluation Logic
+## Core Python Libraries Used
 
-The project uses a simplified rule-based scoring framework to evaluate financial health.
-
-### 1. Liquidity
-Liquidity is assessed using the **Current Ratio**.
-
-- A higher current ratio generally indicates stronger short-term payment ability.
-- Companies with a current ratio above 1.5 are treated as having stronger liquidity.
-- Companies with a current ratio below 1.0 may face short-term financial pressure.
-
-### 2. Solvency
-Solvency is assessed using the **Debt-to-Equity Ratio**.
-
-- A lower debt-to-equity ratio suggests lower dependence on debt financing.
-- A high value may indicate greater financial leverage and potential repayment risk.
-
-### 3. Profitability
-Profitability is assessed using **Profit Margins**.
-
-- Higher profit margins suggest better cost control and stronger earnings capability.
-- Low or negative margins indicate weaker profitability.
-
-### 4. Growth
-Growth is assessed using **Revenue Growth**.
-
-- Positive revenue growth indicates business expansion.
-- Negative growth may suggest declining sales performance.
-
-### Scoring System
-Each dimension contributes a score out of **25 points**.  
-The total possible overall score is **100 points**.
-
-### Rating Categories
-
-- **85–100**: Excellent
-- **70–84**: Good
-- **50–69**: Moderate
-- **Below 50**: Weak
-
-If some indicators are unavailable, the application adjusts the scoring logic based on the available dimensions.
+- **streamlit** – for building the interactive dashboard
+- **yfinance** – for retrieving stock, company, and news data from Yahoo Finance
+- **pandas** – for data loading, cleaning, filtering, transformation, and export
+- **plotly.graph_objects** – for interactive charts and visualisation
+- **os** – for local file path management
+- **datetime** – for parsing and formatting news publication time
 
 ---
 
-## Data Sources
+## Product Design and User Focus
 
-This project uses the following data sources:
+This dashboard was designed with a strong user focus. The goal was not to create a professional trading terminal, but to build a clear and educational data product for non-expert users.
 
-### Online Source
-- **Yahoo Finance**, accessed through the `yfinance` Python package
+### User-oriented design features
+- **Sector-based company selection** to make navigation easier
+- **Simple sidebar controls** for selecting company and analysis period
+- **Optional chart display controls** to avoid overwhelming the user
+- **Automatic fallback to local data** when live data fails
+- **Clear section headings** to guide users through the analysis
+- **Plain-English financial evaluation messages** for each financial dimension
+- **Daily company and market news modules** to add real-world context
+- **Downloadable CSV result** for convenience and reproducibility
 
-### Local Fallback Source
-- Local stock price CSV files stored in the `data/` folder
-- A local `financial_info.csv` file containing company financial indicators
-
-The fallback mechanism is especially useful when Yahoo Finance returns incomplete data or blocks requests due to rate limiting.
-
----
-
-## Technologies Used
-
-The project was implemented using the following tools and libraries:
-
-- **Python**
-- **Streamlit**
-- **Pandas**
-- **yfinance**
-- **Plotly**
-- **OS module**
+### Target users
+- accounting and finance students
+- beginner investors
+- non-specialist users interested in stock analysis
+- users who need a simple educational dashboard rather than a complex professional platform
 
 ---
 
-## Project Structure
+## How to Run
+
+### Environment Requirements
+This project is written in **Python 3** and uses Streamlit for the dashboard interface.
+
+### Required Libraries
+Install the required packages using:
 
 
-stock-financial-health-analyzer/
+py -m pip install --upgrade streamlit yfinance pandas plotly
+If needed, you can also install from a requirements.txt file:
+
+
+py -m pip install -r requirements.txt
+Project Files
+Ensure your project folder includes:
+
+app.py
+optional local CSV files for fallback
+financial_info.csv if using local financial fallback
+stock CSV files such as AAPL.csv, MSFT.csv, etc. if using local price fallback
+Recommended structure:
+
+your_project/
 │
 ├── app.py
-├── build_financial_info.py
-├── requirements.txt
 ├── README.md
-├── .gitignore
-│
+├── requirements.txt
 └── data/
-    ├── financial_info.csv
-    └── optional stock CSV files (e.g. AAPL.csv, MSFT.csv)
-
-# File Description
-app.py
-Main Streamlit application containing the dashboard logic, data loading process, evaluation functions, chart generation, and export functionality.
-
-build_financial_info.py
-Helper script used to generate or prepare the local financial information file.
-
-data/financial_info.csv
-Local fallback file containing financial indicators for supported companies.
-
-data/{ticker}.csv
-Optional fallback files containing local historical stock price data.
-
-requirements.txt
-List of required Python packages.
-
-README.md
-Project documentation.  
-
-# Installation
-Step 1: Clone the Repository
-
-git clone https://github.com/your-username/stock-financial-health-analyzer.git
-cd stock-financial-health-analyzer
-Step 2: Install Dependencies
-
-pip install -r requirements.txt
-
-# Running the Application
-To launch the Streamlit dashboard, run:
+    ├── AAPL.csv
+    ├── MSFT.csv
+    ├── NVDA.csv
+    └── financial_info.csv
+Run the App
+Open the terminal in the project directory and run:
 
 
-streamlit run app.py
-If streamlit is not recognized in your environment, use:
+py -m streamlit run app.py
+After running, Streamlit will provide a local address such as:
 
 
-python -m streamlit run app.py
-After running the command, Streamlit will provide a local URL in the terminal. Open the link in a web browser to use the application.
+http://localhost:8502
+Open that address in your browser.
 
-# Example Use Case
-A user may choose:
+Steps to Reproduce
+Install the required Python packages.
+Save the project files in the correct directory structure.
+Run py -m streamlit run app.py.
+Select a sector and company from the sidebar.
+Select the analysis period.
+Click Run Analysis.
+Review:
+market overview
+stock charts
+financial indicators
+financial health evaluation
+company news
+market news
+Export the result as CSV if needed.
 
-Sector: Technology
-Company: Apple Inc. (AAPL)
-Period: 6 months
-The system will then display:
+##Key Insights & Results
+1. Stock price movements alone do not provide a full evaluation
+A company may show strong recent price performance, but this does not necessarily mean it has strong liquidity, profitability, or solvency. The dashboard highlights the importance of combining market data with financial indicators.
 
-market overview statistics,
-historical stock price charts,
-optional candlestick and volume charts,
-key financial indicators,
-financial health interpretation,
-overall score and rating,
-downloadable CSV result.
+2. Financial health is multi-dimensional
+The project shows that company evaluation should not rely on one ratio only. Liquidity, solvency, profitability, and growth each capture different aspects of financial health, so a broader view gives better insight.
 
-# Reliability and Error Handling
-To improve usability and reliability, the system includes the following mechanisms:
+3. News adds important real-world context
+Daily company news and broader market news help users interpret recent market movement more meaningfully. This improves the practical value of the dashboard beyond purely numerical analysis.
 
-caching of loaded data to reduce repeated API requests;
-fallback from Yahoo Finance to local CSV files;
-explicit error messages when both online and local data are unavailable;
-handling of missing values in financial indicators;
-display of data source status to inform the user whether the data came from Yahoo Finance or local files.
-These design choices help maintain application stability and transparency.
+4. Data reliability matters in financial analysis
+The inclusion of local CSV fallback demonstrates that data availability and reliability are important issues in real-world financial data products. A robust product should continue to function even when live retrieval fails.
 
-# Limitations
-Although the dashboard is functional and informative, several limitations should be noted:
+5. Simplicity improves accessibility
+By presenting data with clear metrics, section headings, user controls, and plain-language interpretation, the dashboard makes financial analysis more accessible to non-expert users.
 
-some financial indicators may be unavailable for certain companies;
-Yahoo Finance data retrieval may be restricted by rate limits or temporary access issues;
-the scoring method is simplified and rule-based rather than statistically or academically validated;
-the application focuses on a limited set of companies and sectors;
-the project is intended for educational use and should not be interpreted as professional investment advice.
-Future Improvements
-Potential future improvements for this project include:
+##Links
+GitHub Repository: [replace with your GitHub repository link]
+Demo Video: [replace with your demo video link]
+Online Streamlit App (if available): [ Local URL: http://localhost:8502
+  Network URL: http://192.168.10.3:8502]
 
-expanding the number of supported companies;
-adding more financial ratios and valuation metrics;
-introducing technical indicators such as RSI or MACD;
-enabling company-to-company comparison;
-improving the scoring model with more advanced financial methodology;
-integrating database storage instead of only CSV files;
-deploying the project online for public access.
-# Conclusion
-The Stock Financial Health Analyzer demonstrates how financial market data and company fundamentals can be integrated into an interactive analytical dashboard. The project combines stock trend visualization, financial indicator reporting, rule-based assessment, and CSV export within a user-friendly interface.
+##Author Info
+Name: [Xinchen.Wang2403]
+Student ID: [2470712]
+Course Code: ACC102
+Track: [Track 4]
 
-By incorporating both online retrieval and local fallback data, the application also addresses a practical issue in financial application development: maintaining system reliability when third-party data services are unstable.
+##AI Disclosure
+I used ChatGPT on [April/2026] to help with:
 
-Overall, this project provides a useful educational example of how Python and Streamlit can be used to build an accessible and interpretable financial analysis tool.
+improving the structure and wording of the README
+refining explanations of the project workflow
+improving the clarity of the analytical problem, user focus, and key insights
+supporting code explanation and documentation writing
+All final coding decisions, project design decisions, file organisation, testing, and final review were completed by me.
 
-# Author
-Developed as an academic project for educational purposes.
+##Notes 
 
-# License
-This project is intended for academic and non-commercial educational use only.
+This dashboard is intended for educational and exploratory purposes only. It provides a simple rule-based interpretation of selected financial indicators and public market information. It should not be treated as professional financial advice or investment advice.
