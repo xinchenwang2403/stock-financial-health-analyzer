@@ -250,7 +250,7 @@ The inclusion of local CSV fallback demonstrates that data availability and reli
 By presenting data with clear metrics, section headings, user controls, and plain-language interpretation, the dashboard makes financial analysis more accessible to non-expert users.
 
 **Links**
-GitHub Repository: [replace with your GitHub repository link]
+GitHub Repository: [https://github.com/xinchenwang2403/stock-financial-health-analyzer.git]
 Demo Video: [replace with your demo video link]
 Online Streamlit App (if available): [ Local URL: http://localhost:8502
   Network URL: http://192.168.10.3:8502]
