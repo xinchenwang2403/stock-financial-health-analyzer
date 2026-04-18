@@ -1,4 +1,5 @@
 import os
+import datetime
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -6,9 +7,6 @@ import plotly.graph_objects as go
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# -----------------------------
-# Page configuration
-# -----------------------------
 st.set_page_config(
     page_title="Stock Financial Health Analyzer",
     page_icon="📈",
@@ -17,14 +15,11 @@ st.set_page_config(
 
 st.title("📈 Stock Financial Health Analyzer")
 st.write(
-    "This dashboard reviews stock price trends and basic financial health indicators. "
-    "It first tries Yahoo Finance. If online retrieval fails, it automatically falls back "
-    "to local CSV files where applicable."
+    "This dashboard reviews stock price trends, basic financial health indicators, "
+    "and the latest investment news. It first tries Yahoo Finance. If online retrieval fails, "
+    "it automatically falls back to local CSV files where applicable."
 )
 
-# -----------------------------
-# Company/sector mapping
-# -----------------------------
 company_data = {
     "Technology": {
         "Apple Inc. (AAPL)": "AAPL",
@@ -72,9 +67,6 @@ company_data = {
     }
 }
 
-# -----------------------------
-# Sidebar
-# -----------------------------
 st.sidebar.header("Input Settings")
 
 selected_sector = st.sidebar.selectbox(
@@ -99,17 +91,14 @@ show_raw_data = st.sidebar.checkbox("Show recent stock data table", value=True)
 show_candlestick = st.sidebar.checkbox("Show candlestick chart", value=True)
 show_volume_chart = st.sidebar.checkbox("Show volume chart", value=True)
 show_moving_averages = st.sidebar.checkbox("Show moving averages", value=True)
+show_company_news = st.sidebar.checkbox("Show company news", value=True)
+show_market_news = st.sidebar.checkbox("Show market news", value=True)
 analyze_button = st.sidebar.button("Run Analysis")
 
 st.sidebar.markdown("---")
 st.sidebar.write(f"**Selected Ticker:** {ticker}")
 st.sidebar.write(f"**Sector Group:** {selected_sector}")
 
-# -----------------------------
-# Helper functions
-# -----------------------------
-def is_valid_number(value):
-    return isinstance(value, (int, float)) and pd.notna(value)
 
 def clean_numeric(value):
     if value is None:
@@ -127,6 +116,7 @@ def clean_numeric(value):
         return float(value)
     return None
 
+
 def display_text(value, fallback="Data not available"):
     if value is None:
         return fallback
@@ -135,6 +125,7 @@ def display_text(value, fallback="Data not available"):
     if isinstance(value, str) and value.strip() == "":
         return fallback
     return value
+
 
 def format_value(value, percentage=False):
     value = clean_numeric(value)
@@ -155,6 +146,7 @@ def format_value(value, percentage=False):
     except Exception:
         return "Data not available"
 
+
 def evaluate_liquidity(current_ratio):
     current_ratio = clean_numeric(current_ratio)
     if current_ratio is None:
@@ -166,16 +158,18 @@ def evaluate_liquidity(current_ratio):
     else:
         return "The company may have a relatively weak liquidity position."
 
+
 def evaluate_solvency(debt_to_equity):
     debt_to_equity = clean_numeric(debt_to_equity)
     if debt_to_equity is None:
         return "Solvency could not be assessed because debt-to-equity data is not available."
     if debt_to_equity < 50:
-        return "The company has a relatively strong solvency position."
+        return "The company appears to have a relatively low debt burden."
     elif debt_to_equity < 100:
-        return "The company has a moderate solvency position."
+        return "The company has a moderate debt level."
     else:
-        return "The company may have a relatively weak solvency position due to high leverage."
+        return "The company may have relatively high leverage."
+
 
 def evaluate_profitability(profit_margins):
     profit_margins = clean_numeric(profit_margins)
@@ -188,6 +182,7 @@ def evaluate_profitability(profit_margins):
     else:
         return "The company’s profitability appears relatively weak."
 
+
 def evaluate_growth(revenue_growth):
     revenue_growth = clean_numeric(revenue_growth)
     if revenue_growth is None:
@@ -198,6 +193,7 @@ def evaluate_growth(revenue_growth):
         return "Revenue is growing."
     else:
         return "Revenue growth is weak or negative."
+
 
 def score_liquidity(current_ratio):
     current_ratio = clean_numeric(current_ratio)
@@ -210,6 +206,7 @@ def score_liquidity(current_ratio):
     else:
         return 10
 
+
 def score_solvency(debt_to_equity):
     debt_to_equity = clean_numeric(debt_to_equity)
     if debt_to_equity is None:
@@ -220,6 +217,7 @@ def score_solvency(debt_to_equity):
         return 18
     else:
         return 10
+
 
 def score_profitability(profit_margins):
     profit_margins = clean_numeric(profit_margins)
@@ -232,6 +230,7 @@ def score_profitability(profit_margins):
     else:
         return 10
 
+
 def score_growth(revenue_growth):
     revenue_growth = clean_numeric(revenue_growth)
     if revenue_growth is None:
@@ -242,6 +241,7 @@ def score_growth(revenue_growth):
         return 18
     else:
         return 10
+
 
 def calculate_overall_score(current_ratio, debt_to_equity, profit_margins, revenue_growth):
     scores = {
@@ -263,6 +263,7 @@ def calculate_overall_score(current_ratio, debt_to_equity, profit_margins, reven
 
     return overall_score, scores
 
+
 def score_label(score):
     if score is None:
         return "Unavailable"
@@ -274,6 +275,7 @@ def score_label(score):
         return "Moderate"
     else:
         return "Weak"
+
 
 def build_overall_summary(liquidity_msg, solvency_msg, profitability_msg, growth_msg, score):
     summary_parts = []
@@ -296,6 +298,7 @@ def build_overall_summary(liquidity_msg, solvency_msg, profitability_msg, growth
 
     return "Overall summary: " + " ".join(summary_parts)
 
+
 def period_to_days(period):
     mapping = {
         "1mo": 30,
@@ -306,6 +309,7 @@ def period_to_days(period):
         "10y": 365 * 10
     }
     return mapping.get(period, 180)
+
 
 def build_export_dataframe(
     ticker, company_name, sector, industry,
@@ -336,6 +340,7 @@ def build_export_dataframe(
     }
     return pd.DataFrame(data)
 
+
 def find_file(filename):
     candidate_paths = [
         os.path.join(BASE_DIR, "data", filename),
@@ -348,19 +353,119 @@ def find_file(filename):
         f"File not found in either location: {candidate_paths[0]} or {candidate_paths[1]}"
     )
 
-# -----------------------------
-# Data loading functions
-# -----------------------------
+
+def format_news_time(raw_time):
+    if raw_time is None:
+        return "Unknown time"
+
+    if isinstance(raw_time, (int, float)):
+        try:
+            dt = datetime.datetime.fromtimestamp(raw_time)
+            return dt.strftime("%Y-%m-%d %H:%M")
+        except Exception:
+            return "Unknown time"
+
+    if isinstance(raw_time, str):
+        try:
+            dt = datetime.datetime.fromisoformat(raw_time.replace("Z", "+00:00"))
+            return dt.strftime("%Y-%m-%d %H:%M")
+        except Exception:
+            return raw_time
+
+    return "Unknown time"
+
+
+def parse_news_item(item):
+    if not isinstance(item, dict):
+        return {
+            "title": "No title available",
+            "publisher": "Unknown source",
+            "link": None,
+            "published": "Unknown time",
+            "summary": "No summary available.",
+            "related": []
+        }
+
+    content = item.get("content", {}) if isinstance(item.get("content", {}), dict) else {}
+
+    title = (
+        item.get("title")
+        or content.get("title")
+        or "No title available"
+    )
+
+    publisher = (
+        item.get("publisher")
+        or content.get("publisher")
+        or content.get("provider", {}).get("displayName")
+        or "Unknown source"
+    )
+
+    link = (
+        item.get("link")
+        or content.get("canonicalUrl", {}).get("url")
+        or content.get("clickThroughUrl", {}).get("url")
+        or None
+    )
+
+    raw_time = (
+        item.get("providerPublishTime")
+        or content.get("pubDate")
+        or item.get("pubDate")
+        or None
+    )
+    published = format_news_time(raw_time)
+
+    summary = (
+        item.get("summary")
+        or content.get("summary")
+        or content.get("description")
+        or "No summary available."
+    )
+
+    related = (
+        item.get("relatedTickers")
+        or content.get("relatedTickers")
+        or []
+    )
+
+    return {
+        "title": title,
+        "publisher": publisher,
+        "link": link,
+        "published": published,
+        "summary": summary,
+        "related": related
+    }
+
+
+def deduplicate_news(news_items):
+    seen = set()
+    clean_list = []
+
+    for item in news_items:
+        parsed = parse_news_item(item)
+        key = (parsed["title"], parsed["link"])
+
+        if key not in seen:
+            seen.add(key)
+            clean_list.append(parsed)
+
+    return clean_list
+
+
 @st.cache_data(ttl=1800)
 def load_stock_history_online(ticker, period):
     stock = yf.Ticker(ticker)
     hist = stock.history(period=period)
     return hist
 
+
 @st.cache_data(ttl=1800)
 def load_stock_info_online(ticker):
     stock = yf.Ticker(ticker)
     return stock.info
+
 
 @st.cache_data(ttl=1800)
 def load_local_csv_data(ticker, period):
@@ -386,6 +491,7 @@ def load_local_csv_data(ticker, period):
         raise ValueError(f"No local stock data available for ticker {ticker} within period {period}.")
 
     return filtered_df
+
 
 @st.cache_data(ttl=1800)
 def load_local_financial_info(ticker):
@@ -417,9 +523,38 @@ def load_local_financial_info(ticker):
 
     return record
 
-# -----------------------------
-# Main analysis
-# -----------------------------
+
+@st.cache_data(ttl=1800)
+def load_company_news(ticker):
+    try:
+        stock = yf.Ticker(ticker)
+        news = stock.news
+        if not news:
+            return []
+        parsed_news = deduplicate_news(news)
+        return parsed_news
+    except Exception:
+        return []
+
+
+@st.cache_data(ttl=1800)
+def load_market_news():
+    market_tickers = ["^GSPC", "^IXIC", "^DJI"]
+    all_news = []
+
+    for mt in market_tickers:
+        try:
+            index_obj = yf.Ticker(mt)
+            items = index_obj.news
+            if items:
+                all_news.extend(items)
+        except Exception:
+            continue
+
+    parsed_news = deduplicate_news(all_news)
+    return parsed_news[:8]
+
+
 if analyze_button:
     if not ticker:
         st.warning("Please select a valid stock ticker symbol.")
@@ -434,9 +569,6 @@ if analyze_button:
         online_info_error = None
         local_info_error = None
 
-        # -----------------------------
-        # Price data: Yahoo Finance first, then local CSV
-        # -----------------------------
         try:
             with st.spinner("Trying to retrieve stock price data from Yahoo Finance..."):
                 hist = load_stock_history_online(ticker, period)
@@ -462,9 +594,6 @@ if analyze_button:
                 st.write(f"**Local CSV price error:** {local_price_error}")
             st.stop()
 
-        # -----------------------------
-        # Financial info: Yahoo Finance -> Local CSV
-        # -----------------------------
         try:
             with st.spinner("Trying to retrieve company financial indicators from Yahoo Finance..."):
                 info = load_stock_info_online(ticker)
@@ -493,9 +622,6 @@ if analyze_button:
                 }
                 info_source = "Unavailable"
 
-        # -----------------------------
-        # Source status display
-        # -----------------------------
         st.success(f"Stock price data source: **{price_source}**")
         st.success(f"Financial info source: **{info_source}**")
 
@@ -525,9 +651,6 @@ if analyze_button:
         st.subheader(f"{company_name} ({ticker})")
         st.write(f"**Sector:** {sector} | **Industry:** {industry}")
 
-        # -----------------------------
-        # Market Overview
-        # -----------------------------
         st.header("1. Market Overview")
 
         latest_close = float(hist["Close"].iloc[-1])
@@ -574,7 +697,6 @@ if analyze_button:
                 name="20-Day Moving Average",
                 line=dict(dash="dash")
             ))
-
             fig.add_trace(go.Scatter(
                 x=hist.index,
                 y=hist["MA50"],
@@ -594,9 +716,6 @@ if analyze_button:
 
         st.plotly_chart(fig, use_container_width=True)
 
-        # -----------------------------
-        # Enhanced chart: Candlestick
-        # -----------------------------
         if show_candlestick and all(col in hist.columns for col in ["Open", "High", "Low", "Close"]):
             st.subheader("Candlestick Chart")
 
@@ -621,9 +740,6 @@ if analyze_button:
 
             st.plotly_chart(candle_fig, use_container_width=True)
 
-        # -----------------------------
-        # Enhanced chart: Volume
-        # -----------------------------
         if show_volume_chart and "Volume" in hist.columns:
             st.subheader("Trading Volume")
 
@@ -644,9 +760,6 @@ if analyze_button:
 
             st.plotly_chart(volume_fig, use_container_width=True)
 
-        # -----------------------------
-        # Key Financial Indicators
-        # -----------------------------
         st.header("2. Key Financial Indicators")
 
         market_cap = info.get("marketCap", None)
@@ -678,9 +791,6 @@ if analyze_button:
         if available_financial_items <= 2:
             st.info("Only limited financial indicator data is currently available for this company.")
 
-        # -----------------------------
-        # Financial Dimension Evaluation
-        # -----------------------------
         st.header("3. Financial Dimension Evaluation")
 
         liquidity_msg = evaluate_liquidity(current_ratio)
@@ -693,20 +803,15 @@ if analyze_button:
         with eval_col1:
             st.subheader("Liquidity")
             st.write(f"- {liquidity_msg}")
-
             st.subheader("Solvency")
             st.write(f"- {solvency_msg}")
 
         with eval_col2:
             st.subheader("Profitability")
             st.write(f"- {profitability_msg}")
-
             st.subheader("Growth")
             st.write(f"- {growth_msg}")
 
-        # -----------------------------
-        # Overall Financial Health Score
-        # -----------------------------
         st.header("4. Overall Financial Health Score")
 
         overall_score, dimension_scores = calculate_overall_score(
@@ -721,10 +826,7 @@ if analyze_button:
             "Overall Score",
             f"{overall_score}/100" if overall_score is not None else "Insufficient data"
         )
-        score_col2.metric(
-            "Rating",
-            score_label(overall_score)
-        )
+        score_col2.metric("Rating", score_label(overall_score))
 
         st.subheader("Dimension Scores")
         st.write(f"- Liquidity: {dimension_scores['Liquidity'] if dimension_scores['Liquidity'] is not None else 'Not available'} / 25")
@@ -732,9 +834,6 @@ if analyze_button:
         st.write(f"- Profitability: {dimension_scores['Profitability'] if dimension_scores['Profitability'] is not None else 'Not available'} / 25")
         st.write(f"- Growth: {dimension_scores['Growth'] if dimension_scores['Growth'] is not None else 'Not available'} / 25")
 
-        # -----------------------------
-        # Summary Insight
-        # -----------------------------
         st.header("5. Summary Insight")
 
         summary_text = build_overall_summary(
@@ -749,14 +848,52 @@ if analyze_button:
         with st.expander("Interpretation Note"):
             st.write(
                 "This dashboard provides a simple rule-based interpretation and scoring framework "
-                "using selected financial indicators. It integrates public market data and local CSV fallback. "
-                "The tool is intended for educational and exploratory use rather than as professional investment advice."
+                "using selected financial indicators. It integrates public market data, company information, "
+                "and daily news, with local CSV fallback for some datasets. The tool is intended for educational "
+                "and exploratory use rather than as professional investment advice."
             )
 
-        # -----------------------------
-        # Export
-        # -----------------------------
-        st.header("6. Export Analysis Result")
+        if show_company_news:
+            st.header("6. Daily Company News")
+
+            company_news = load_company_news(ticker)
+
+            if company_news:
+                st.write(f"Latest news related to **{company_name} ({ticker})**:")
+
+                for i, item in enumerate(company_news[:5], start=1):
+                    st.subheader(f"{i}. {item['title']}")
+                    st.write(f"**Source:** {item['publisher']}")
+                    st.write(f"**Published:** {item['published']}")
+                    st.write(f"**Summary:** {item['summary']}")
+                    if item["link"]:
+                        st.markdown(f"[Read full article]({item['link']})")
+                    st.markdown("---")
+            else:
+                st.info("No recent company news is currently available for this ticker.")
+
+        if show_market_news:
+            st.header("7. Daily Market News")
+
+            market_news = load_market_news()
+
+            if market_news:
+                st.write("Latest market-wide news from major indices and the broader investment environment:")
+
+                for i, item in enumerate(market_news[:6], start=1):
+                    st.subheader(f"{i}. {item['title']}")
+                    st.write(f"**Source:** {item['publisher']}")
+                    st.write(f"**Published:** {item['published']}")
+                    st.write(f"**Summary:** {item['summary']}")
+                    if item["related"]:
+                        st.write(f"**Related Tickers:** {', '.join(item['related'][:6])}")
+                    if item["link"]:
+                        st.markdown(f"[Read full article]({item['link']})")
+                    st.markdown("---")
+            else:
+                st.info("No recent market news is currently available.")
+
+        st.header("8. Export Analysis Result")
 
         export_df = build_export_dataframe(
             ticker=ticker,
