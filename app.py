@@ -164,11 +164,11 @@ def evaluate_solvency(debt_to_equity):
     if debt_to_equity is None:
         return "Solvency could not be assessed because debt-to-equity data is not available."
     if debt_to_equity < 50:
-        return "The company appears to have a relatively low debt burden."
-    elif debt_to_equity < 100:
-        return "The company has a moderate debt level."
+        return "The company shows a relatively strong solvency position."
+    elif debt_to_equity <= 100:
+        return "The company has a moderate solvency position."
     else:
-        return "The company may have relatively high leverage."
+        return "The company may rely heavily on debt financing."
 
 
 def evaluate_profitability(profit_margins):
@@ -213,7 +213,7 @@ def score_solvency(debt_to_equity):
         return None
     if debt_to_equity < 50:
         return 25
-    elif debt_to_equity < 100:
+    elif debt_to_equity <= 100:
         return 18
     else:
         return 10
@@ -525,16 +525,84 @@ def load_local_financial_info(ticker):
 
 
 @st.cache_data(ttl=1800)
+def load_local_company_news(ticker):
+    file_path = find_file("company_news.csv")
+    df = pd.read_csv(file_path)
+
+    required_cols = ["ticker", "title", "publisher", "published", "summary", "link"]
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"company_news.csv must contain a '{col}' column.")
+
+    filtered = df[df["ticker"].astype(str).str.upper() == ticker.upper()].copy()
+
+    if filtered.empty:
+        return []
+
+    records = []
+    for _, row in filtered.iterrows():
+        records.append({
+            "title": row["title"] if pd.notna(row["title"]) else "No title available",
+            "publisher": row["publisher"] if pd.notna(row["publisher"]) else "Unknown source",
+            "link": row["link"] if pd.notna(row["link"]) else None,
+            "published": row["published"] if pd.notna(row["published"]) else "Unknown time",
+            "summary": row["summary"] if pd.notna(row["summary"]) else "No summary available.",
+            "related": []
+        })
+
+    return records
+
+
+@st.cache_data(ttl=1800)
 def load_company_news(ticker):
     try:
         stock = yf.Ticker(ticker)
         news = stock.news
-        if not news:
-            return []
-        parsed_news = deduplicate_news(news)
-        return parsed_news
+        if news:
+            parsed_news = deduplicate_news(news)
+            if parsed_news:
+                return parsed_news, "Yahoo Finance"
     except Exception:
+        pass
+
+    try:
+        local_news = load_local_company_news(ticker)
+        if local_news:
+            return local_news, "Local company_news.csv"
+    except Exception:
+        pass
+
+    return [], "Unavailable"
+
+
+@st.cache_data(ttl=1800)
+def load_local_market_news():
+    file_path = find_file("market_news.csv")
+    df = pd.read_csv(file_path)
+
+    required_cols = ["title", "publisher", "published", "summary", "link", "related"]
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"market_news.csv must contain a '{col}' column.")
+
+    if df.empty:
         return []
+
+    records = []
+    for _, row in df.iterrows():
+        related_value = row["related"] if pd.notna(row["related"]) else ""
+        related_list = [x.strip() for x in str(related_value).split(",") if x.strip()]
+
+        records.append({
+            "title": row["title"] if pd.notna(row["title"]) else "No title available",
+            "publisher": row["publisher"] if pd.notna(row["publisher"]) else "Unknown source",
+            "link": row["link"] if pd.notna(row["link"]) else None,
+            "published": row["published"] if pd.notna(row["published"]) else "Unknown time",
+            "summary": row["summary"] if pd.notna(row["summary"]) else "No summary available.",
+            "related": related_list
+        })
+
+    return records
 
 
 @st.cache_data(ttl=1800)
@@ -552,7 +620,17 @@ def load_market_news():
             continue
 
     parsed_news = deduplicate_news(all_news)
-    return parsed_news[:8]
+    if parsed_news:
+        return parsed_news[:8], "Yahoo Finance"
+
+    try:
+        local_news = load_local_market_news()
+        if local_news:
+            return local_news[:8], "Local market_news.csv"
+    except Exception:
+        pass
+
+    return [], "Unavailable"
 
 
 if analyze_button:
@@ -856,10 +934,11 @@ if analyze_button:
         if show_company_news:
             st.header("6. Daily Company News")
 
-            company_news = load_company_news(ticker)
+            company_news, company_news_source = load_company_news(ticker)
 
             if company_news:
                 st.write(f"Latest news related to **{company_name} ({ticker})**:")
+                st.caption(f"News source: {company_news_source}")
 
                 for i, item in enumerate(company_news[:5], start=1):
                     st.subheader(f"{i}. {item['title']}")
@@ -875,10 +954,11 @@ if analyze_button:
         if show_market_news:
             st.header("7. Daily Market News")
 
-            market_news = load_market_news()
+            market_news, market_news_source = load_market_news()
 
             if market_news:
                 st.write("Latest market-wide news from major indices and the broader investment environment:")
+                st.caption(f"News source: {market_news_source}")
 
                 for i, item in enumerate(market_news[:6], start=1):
                     st.subheader(f"{i}. {item['title']}")
