@@ -266,10 +266,8 @@ market_news.csv
 
 ## Links
 GitHub Repository: [https://github.com/xinchenwang2403/stock-financial-health-analyzer.git]
-Demo Video: [录制：Stock Financial Health Analyzer - QQ浏览器
-日期：2026-04-21 15:01:21
-录制文件：https://meeting.tencent.com/crm/l5YBwJ0Vae]
-Online App / Streamlit Link: [http://localhost:8501]
+Demo Video: [https://video.xjtlu.edu.cn/Mediasite/Channel/556fdc2c32b340f58d12b8179e0284435f/headless/watch/658466a072194114b604ec9b3930ec2f1d]
+Online App / Streamlit Link: [https://stock-financial-health-analyzer-9evatafgzn8fzejf8mexun.streamlit.app/]
 If a public online app is not available, replace the third link with:
 Online App / Streamlit Link: Not deployed publicly; please run locally using the instructions above.
 
